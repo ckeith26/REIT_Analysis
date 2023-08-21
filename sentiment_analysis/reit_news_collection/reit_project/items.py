@@ -1,3 +1,7 @@
+# Cameron Keith
+# August 20, 2023
+# AI ML U Chicago Class
+
 # Define here the models for your scraped items
 #
 # See documentation in:
@@ -10,7 +14,4 @@ class ReitArticleItem(scrapy.Item):
     year = scrapy.Field()
     sector = scrapy.Field()
     companies_mentioned = scrapy.Field()
-
     sentiment_score = scrapy.Field()
-
-    # title = scrapy.Field()

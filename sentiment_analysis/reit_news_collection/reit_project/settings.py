@@ -1,3 +1,7 @@
+# Cameron Keith
+# August 20, 2023
+# AI ML U Chicago Class
+
 # Scrapy settings for reit_project project
 #
 # For simplicity, this file contains only settings considered important or

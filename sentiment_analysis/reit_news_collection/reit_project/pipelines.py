@@ -1,3 +1,7 @@
+# Cameron Keith
+# August 20, 2023
+# AI ML U Chicago Class
+
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
@@ -5,23 +9,22 @@
 
 # useful for handling different item types with a single interface
 # from itemadapter import ItemAdapter
+
 import re
+from datetime import datetime
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
+# Pipeline for cleaning data
 class CleanDataPipeline:
 
     def process_item(self, item, spider):
+
         if 'month' in item:
             raw_date = item['month']
             month, year = self.clean_date(raw_date)
             item['month'] = month
             item['year'] = year[-2:]
 
-        # # Clean the title
-        # if 'title' in item:
-        #     cleaned_title = self.clean_title(item['title'])
-        #     item['title'] = cleaned_title
-        
         return item
 
     def clean_date(self, raw_date):
@@ -32,14 +35,11 @@ class CleanDataPipeline:
             return month, year #,day
         return None, None #, None
 
-    # def clean_title(self, raw_title):
-    #     # Remove excess spaces and unwanted characters
-    #     cleaned_title = ' '.join(raw_title.strip().split())
-    #     cleaned_title = cleaned_title.replace('"', '').replace('“', '').replace('”', '')  # Remove double quotes and similar characters
-    #     return cleaned_title
-
+# Pipeline for sentiment analysis
 class SentimentAnalysisPipeline:
+
     def process_item(self, item, spider):
+
         content = item['sentiment_score']
         sia = SentimentIntensityAnalyzer()
         sentiment_scores = sia.polarity_scores(content)
@@ -47,3 +47,63 @@ class SentimentAnalysisPipeline:
         item['sentiment_score'] = sentiment_score
         return item
 
+# Pipeline for REIT political data
+class ReitPolPipeline:
+
+    def process_item(self, item, spider):
+
+        sentiment = 0
+        if item['sentiment_score'] == 'Purchase':
+            sentiment = 1
+        elif item['sentiment_score'] == 'Sale':
+            sentiment = -1
+
+        item['sentiment_score'] = sentiment
+        month, year = self.clean_date(item['month'])
+
+        item['month'] = month
+        item['year'] = year
+
+        return item
+
+    def clean_date(self, input_date):
+        # Convert input string to a datetime object
+        input_date = datetime.strptime(input_date, "%b. %d, %Y")
+
+        # Convert datetime object to desired output format
+        output_month = input_date.strftime("%m")
+        output_year = input_date.strftime("%Y")
+
+        output_year = output_year[-2:]
+
+        return output_month, output_year
+
+# Pipeline for REIT insider data
+class ReitInsiderPipeline:
+
+    def process_item(self, item, spider):
+
+        sentiment = 0
+        if item['sentiment_score'] == 'Purchase':
+            sentiment = 1
+        elif item['sentiment_score'] == 'Sale':
+            sentiment = -1
+
+        item['sentiment_score'] = sentiment
+        month, year = self.clean_date(item['month'])
+
+        item['month'] = month
+        item['year'] = year[-2:]
+
+        return item
+
+    def clean_date(self, input_date):
+        # Convert input string to a datetime object
+        input_date = input_date[:3] + '.' + input_date[3:]
+        input_date = datetime.strptime(input_date, "%b. %d, %Y")
+
+        # Convert datetime object to desired output format
+        output_month = input_date.strftime("%m")
+        output_year = input_date.strftime("%Y")
+        output_year = output_year[-2:]
+        return output_month, output_year
